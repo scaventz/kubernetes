@@ -160,6 +160,7 @@ function kube::build::verify_prereqs() {
   kube::log::status "Verifying Prerequisites...."
   kube::build::ensure_tar || return 1
   kube::build::ensure_rsync || return 1
+  kube::log::status "require_docker: ${require_docker}"
   if ${require_docker}; then
     kube::build::ensure_docker_in_path || return 1
     if kube::build::is_osx; then
@@ -189,7 +190,7 @@ function kube::build::verify_prereqs() {
 
   kube::version::get_version_vars
   kube::version::save_version_vars "${KUBE_ROOT}/.dockerized-kube-version-defs"
-
+  kube::log::status "Verifying Prerequisites....succeed"  
   # Without this, the user's umask can leak through.
   umask 0022
 }
@@ -300,12 +301,12 @@ function kube::build::docker_delete_old_images() {
 }
 
 # Stop and delete all containers that match a pattern
-#
-# $1: The base container prefix
-# $2: The current container to keep, if provided
 function kube::build::docker_delete_old_containers() {
   # In Docker 1.12 we can replace this line with
   #   docker ps -a --format="{{.Names}}"
+  echo "DOCKER[@] in docker_delete_old_containers: ${DOCKER[@]}"
+  echo "arg1: $1"
+  echo "arg2: $2"
   for container in $("${DOCKER[@]}" ps -a | tail -n +2 | awk '{print $NF}') ; do
     if [[ "${container}" != "${1}"* ]] ; then
       V=3 kube::log::status "Keeping container ${container}"
@@ -319,6 +320,9 @@ function kube::build::docker_delete_old_containers() {
     fi
   done
 }
+# $1: The base container prefix
+# $2: The current container to keep, if provided
+
 
 # Takes $1 and computes a short has for it. Useful for unique tag generation
 function kube::build::short_hash() {
@@ -341,6 +345,8 @@ function kube::build::short_hash() {
 # container, wait to ensure it's stopped, then try the remove. This is
 # a workaround for bug https://github.com/docker/docker/issues/3968.
 function kube::build::destroy_container() {
+  kube::log::status "[kube::build::destroy_container] 1"
+  kube::log::status "\$\{DOCKER[@]\} is: "${DOCKER[@]}""
   "${DOCKER[@]}" kill "$1" >/dev/null 2>&1 || true
   if [[ $("${DOCKER[@]}" version --format '{{.Server.Version}}') = 17.06.0* ]]; then
     # Workaround https://github.com/moby/moby/issues/33948.
@@ -350,6 +356,7 @@ function kube::build::destroy_container() {
     "${DOCKER[@]}" wait "$1" >/dev/null 2>&1 || true
   fi
   "${DOCKER[@]}" rm -f -v "$1" >/dev/null 2>&1 || true
+  kube::log::status "[kube::build::destroy_container] 2"
 }
 
 # ---------------------------------------------------------------------------
@@ -380,6 +387,7 @@ function kube::build::build_image() {
   mkdir -p "${LOCAL_OUTPUT_BUILD_CONTEXT}"
   # Make sure the context directory owned by the right user for syncing sources to container.
   chown -R "${USER_ID}":"${GROUP_ID}" "${LOCAL_OUTPUT_BUILD_CONTEXT}"
+  kube::log::status "LOCAL_OUTPUT_BUILD_CONTEXT: ${LOCAL_OUTPUT_BUILD_CONTEXT}"
 
   cp /etc/localtime "${LOCAL_OUTPUT_BUILD_CONTEXT}/"
   chmod u+w "${LOCAL_OUTPUT_BUILD_CONTEXT}/localtime"
@@ -388,7 +396,8 @@ function kube::build::build_image() {
   cp "${KUBE_ROOT}/build/build-image/rsyncd.sh" "${LOCAL_OUTPUT_BUILD_CONTEXT}/"
   dd if=/dev/urandom bs=512 count=1 2>/dev/null | LC_ALL=C tr -dc 'A-Za-z0-9' | dd bs=32 count=1 2>/dev/null > "${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password"
   chmod go= "${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password"
-
+ 
+  kube::log::status "arg paass to docker_build: " "${KUBE_BUILD_IMAGE}" "${LOCAL_OUTPUT_BUILD_CONTEXT}" 'false' "--build-arg=KUBE_CROSS_IMAGE=${KUBE_CROSS_IMAGE} --build-arg=KUBE_CROSS_VERSION=${KUBE_CROSS_VERSION}"
   kube::build::docker_build "${KUBE_BUILD_IMAGE}" "${LOCAL_OUTPUT_BUILD_CONTEXT}" 'false' "--build-arg=KUBE_CROSS_IMAGE=${KUBE_CROSS_IMAGE} --build-arg=KUBE_CROSS_VERSION=${KUBE_CROSS_VERSION}"
 
   # Clean up old versions of everything
@@ -418,6 +427,8 @@ function kube::build::docker_build() {
   local -ra build_cmd=("${DOCKER[@]}" buildx build --load -t "${image}" "--pull=${pull}" "${build_args[@]}" "${context_dir}")
 
   kube::log::status "Building Docker image ${image}"
+  kube::log::status "build_cmd: ${build_cmd}"
+  kube::log::status "build_cmd: ${build_cmd[@]}"
   local docker_output
   docker_output=$(DOCKER_CLI_EXPERIMENTAL=enabled "${build_cmd[@]}" 2>&1) || {
     cat <<EOF >&2
@@ -435,6 +446,7 @@ EOF
 }
 
 function kube::build::ensure_data_container() {
+  kube::log::status "first line of kube::build::ensure_data_container()"
   # If the data container exists AND exited successfully, we can use it.
   # Otherwise nuke it and start over.
   local ret=0
@@ -444,13 +456,16 @@ function kube::build::ensure_data_container() {
       -f '{{.State.ExitCode}}' \
       "${KUBE_DATA_CONTAINER_NAME}" 2>/dev/null) || ret=$?
   if [[ "${ret}" == 0 && "${code}" != 0 ]]; then
+    kube::log::status "destroying container: ${KUBE_DATA_CONTAINER_NAME}"
     kube::build::destroy_container "${KUBE_DATA_CONTAINER_NAME}"
     ret=1
   fi
+  kube::log::status "kube::build::ensure_data_container() === 1"
   if [[ "${ret}" != 0 ]]; then
     kube::log::status "Creating data container ${KUBE_DATA_CONTAINER_NAME}"
     # We have to ensure the directory exists, or else the docker run will
     # create it as root.
+    kube::log::status "Making dir: LOCAL_OUTPUT_GOPATH: ${LOCAL_OUTPUT_GOPATH}"
     mkdir -p "${LOCAL_OUTPUT_GOPATH}"
     # We want this to run as root to be able to chown, so non-root users can
     # later use the result as a data container.  This run both creates the data
@@ -479,14 +494,17 @@ function kube::build::ensure_data_container() {
         "${REMOTE_ROOT}"
         /usr/local/go/pkg/
     )
+	kube::log::status "Creating data container with command: ${docker_cmd[@]}"
     "${docker_cmd[@]}"
   fi
+  kube::log::status "last line of kube::build::ensure_data_container()"
 }
 
 # Run a command in the kube-build image.  This assumes that the image has
 # already been built.
 function kube::build::run_build_command() {
   kube::log::status "Running build command..."
+  kube::log::status "KUBE_BUILD_CONTAINER_NAME: ${KUBE_BUILD_CONTAINER_NAME}"
   kube::build::run_build_command_ex "${KUBE_BUILD_CONTAINER_NAME}" -- "$@"
 }
 
@@ -496,6 +514,8 @@ function kube::build::run_build_command() {
 # Arguments are in the form of
 #  <container name> <extra docker args> -- <command>
 function kube::build::run_build_command_ex() {
+  echo "wow"
+  kube::log::status "entering method kube::build::run_build_command_ex"
   [[ $# != 0 ]] || { echo "Invalid input - please specify a container name." >&2; return 4; }
   local container_name="${1}"
   shift
@@ -575,6 +595,8 @@ function kube::build::run_build_command_ex() {
 
   # Clean up container from any previous run
   kube::build::destroy_container "${container_name}"
+  kube::log::status "destry container: ${container_name}"
+  kube::log::status "exec: ${docker_cmd[@]}" "${cmd[@]}"
   "${docker_cmd[@]}" "${cmd[@]}"
   if [[ "${detach}" == false ]]; then
     kube::build::destroy_container "${container_name}"
@@ -585,15 +607,20 @@ function kube::build::rsync_probe {
   # Wait until rsync is up and running.
   local tries=20
   while (( tries > 0 )) ; do
+    echo "rsync "rsync://k8s@${1}:${2}/" \
+         --password-file="${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password" \
+         &> /dev/null ; then"
     if rsync "rsync://k8s@${1}:${2}/" \
          --password-file="${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password" \
-         &> /dev/null ; then
+         ; then
+      echo "rsync succeed"
       return 0
     fi
     tries=$(( tries - 1))
     sleep 0.1
   done
 
+  echo "out of tries of 20, error exit"
   return 1
 }
 
@@ -603,16 +630,30 @@ function kube::build::rsync_probe {
 # This will set the global var KUBE_RSYNC_ADDR to the effective port that the
 # rsync daemon can be reached out.
 function kube::build::start_rsyncd_container() {
+  kube::log::status "start_rsyncd_container() first line"
   IPTOOL=ifconfig
   if kube::build::has_ip ; then
     IPTOOL="ip address"
   fi
+  kube::log::status "bofore kube::build::stop_rsyncd_container"
   kube::build::stop_rsyncd_container
   V=3 kube::log::status "Starting rsyncd container"
+  kube::log::status "${KUBE_RSYNC_CONTAINER_NAME} -p 127.0.0.1:${KUBE_RSYNC_PORT}:${KUBE_CONTAINER_RSYNC_PORT} -d \
+    -e ALLOW_HOST="$(${IPTOOL} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | tr '\n' ' ')" \
+    -- /rsyncd.sh >/dev/null"
+
+  kube::log::status "going to execute kube::build::run_build_command_ex"
+  echo "hello world"
+  #kube::build::run_build_command_ex \
+  #  "${KUBE_RSYNC_CONTAINER_NAME}" -p 127.0.0.1:"${KUBE_RSYNC_PORT}":"${KUBE_CONTAINER_RSYNC_PORT}" -d \
+  #  -e ALLOW_HOST="$(${IPTOOL} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | tr '\n' ' ')" \
+  #  -- /rsyncd.sh >/dev/null
   kube::build::run_build_command_ex \
     "${KUBE_RSYNC_CONTAINER_NAME}" -p 127.0.0.1:"${KUBE_RSYNC_PORT}":"${KUBE_CONTAINER_RSYNC_PORT}" -d \
     -e ALLOW_HOST="$(${IPTOOL} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | tr '\n' ' ')" \
-    -- /rsyncd.sh >/dev/null
+    -- /rsyncd.sh
+
+  kube::log::status "just excuted kube::build::run_build_command_ex"
 
   local mapped_port
   if ! mapped_port=$("${DOCKER[@]}" port "${KUBE_RSYNC_CONTAINER_NAME}" "${KUBE_CONTAINER_RSYNC_PORT}" 2> /dev/null | cut -d: -f 2) ; then
@@ -620,8 +661,11 @@ function kube::build::start_rsyncd_container() {
     return 1
   fi
 
+  echo "mapped_port: ${mapped_port}"
+
   local container_ip
   container_ip=$("${DOCKER[@]}" inspect --format '{{ .NetworkSettings.IPAddress }}' "${KUBE_RSYNC_CONTAINER_NAME}")
+  echo "container_ip: ${container_ip}"  
 
   # Sometimes we can reach rsync through localhost and a NAT'd port.  Other
   # times (when we are running in another docker container on the Jenkins
@@ -630,9 +674,11 @@ function kube::build::start_rsyncd_container() {
   # are in.
   if kube::build::rsync_probe 127.0.0.1 "${mapped_port}"; then
     KUBE_RSYNC_ADDR="127.0.0.1:${mapped_port}"
+    echo "KUBE_RSYNC_ADDR= 127.0.0.1:${mapped_port}"
     return 0
   elif kube::build::rsync_probe "${container_ip}" "${KUBE_CONTAINER_RSYNC_PORT}"; then
     KUBE_RSYNC_ADDR="${container_ip}:${KUBE_CONTAINER_RSYNC_PORT}"
+    echo "KUBE_RSYNC_ADDR=${container_ip}:${KUBE_CONTAINER_RSYNC_PORT}"
     return 0
   fi
 
@@ -641,9 +687,12 @@ function kube::build::start_rsyncd_container() {
 }
 
 function kube::build::stop_rsyncd_container() {
+  kube::log::status "[start] kube::build::stop_rsyncd_container"
   V=3 kube::log::status "Stopping any currently running rsyncd container"
   unset KUBE_RSYNC_ADDR
+  kube::log::status "[mid] kube::build::stop_rsyncd_container: ${KUBE_RSYNC_CONTAINER_NAME}"
   kube::build::destroy_container "${KUBE_RSYNC_CONTAINER_NAME}"
+  kube::log::status "[end] kube::build::stop_rsyncd_container: ${KUBE_RSYNC_CONTAINER_NAME}"
 }
 
 function kube::build::rsync {
@@ -658,6 +707,7 @@ function kube::build::rsync {
      rsync_opts+=("--compress-level=${KUBE_RSYNC_COMPRESS}")
   fi
   V=3 kube::log::status "Running rsync"
+  kube::log::status "rsync command: ${rsync_opts[@]} $@"
   rsync "${rsync_opts[@]}" "$@"
 }
 
@@ -677,14 +727,16 @@ function kube::build::sync_to_container() {
   # are hidden from rsync so they will be deleted in the target container if
   # they exist. This will allow them to be re-created in the container if
   # necessary.
+  kube::log::status "execute rsync"
   kube::build::rsync \
     --delete \
     --filter='- /_tmp/' \
     --filter='- /_output/' \
     --filter='- /' \
     "${KUBE_ROOT}/" "rsync://k8s@${KUBE_RSYNC_ADDR}/k8s/"
-
+  kube::log::status "execute rsync succed"
   kube::build::stop_rsyncd_container
+  kube::log::status "stop_rsyncd_container succed"
 }
 
 # Copy all build results back out.

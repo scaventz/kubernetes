@@ -1,0 +1,352 @@
++++ [0919 20:18:21] Verifying Prerequisites....
++++ [0919 20:18:21] require_docker: true
++++ [0919 20:18:28] Docker Version:
+Client: Docker Engine - Community
+Cloud integration: v1.0.35+desktop.5
+Version:           24.0.7
+API version:       1.43
+Go version:        go1.20.10
+Git commit:        afdd53b
+Built:             Thu Oct 26 09:08:17 2023
+OS/Arch:           linux/amd64
+Context:           default
+
+Server: Docker Desktop
+Engine:
+Version:          24.0.7
+API version:      1.43 (minimum version 1.12)
+Go version:       go1.20.10
+Git commit:       311b9ff
+Built:            Thu Oct 26 09:08:02 2023
+OS/Arch:          linux/amd64
+Experimental:     false
+containerd:
+Version:          1.6.25
+GitCommit:        d8f198a4ed8892c764191ef7b3b06d8a2eeb5c7f
+runc:
+Version:          1.1.10
+GitCommit:        v1.1.10-0-g18a0cb0
+docker-init:
+Version:          0.19.0
+GitCommit:        de40ad0
++++ [0919 20:18:22] Verifying Prerequisites....succeed
++++ [0919 20:18:22] LOCAL_OUTPUT_BUILD_CONTEXT: /home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:22] arg paass to docker_build: 
+    kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    /home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    false
+    --build-arg=KUBE_CROSS_IMAGE=registry.k8s.io/build-image/kube-cross --build-arg=KUBE_CROSS_VERSION=v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:23] Building Docker image kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:23] build_cmd: docker
++++ [0919 20:18:23] build_cmd: docker
+    buildx
+    build
+    --load
+    -t
+    kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    --pull=false
+    --build-arg=KUBE_CROSS_IMAGE=registry.k8s.io/build-image/kube-cross
+    --build-arg=KUBE_CROSS_VERSION=v1.31.0-go1.22.4-bullseye.0
+    /home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+DOCKER[@] in docker_delete_old_containers: docker
+arg1: kube-build-9bcdcf4a5b
+arg2: kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container inspiring_mendeleev
++++ [0919 20:18:28] Keeping container thirsty_swanson
++++ [0919 20:18:28] Keeping container distracted_haslett
++++ [0919 20:18:28] Keeping container affectionate_shtern
++++ [0919 20:18:28] Keeping container crazy_jones
++++ [0919 20:18:28] Keeping container sweet_goldberg
++++ [0919 20:18:28] Keeping container kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+DOCKER[@] in docker_delete_old_containers: docker
+arg1: kube-rsync-9bcdcf4a5b
+arg2: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container inspiring_mendeleev
++++ [0919 20:18:28] Keeping container thirsty_swanson
++++ [0919 20:18:28] Keeping container distracted_haslett
++++ [0919 20:18:28] Keeping container affectionate_shtern
++++ [0919 20:18:28] Keeping container crazy_jones
++++ [0919 20:18:28] Keeping container sweet_goldberg
++++ [0919 20:18:28] Keeping container kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+DOCKER[@] in docker_delete_old_containers: docker
+arg1: kube-build-data-9bcdcf4a5b
+arg2: kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping container inspiring_mendeleev
++++ [0919 20:18:28] Keeping container thirsty_swanson
++++ [0919 20:18:28] Keeping container distracted_haslett
++++ [0919 20:18:28] Keeping container affectionate_shtern
++++ [0919 20:18:28] Keeping container crazy_jones
++++ [0919 20:18:28] Keeping container sweet_goldberg
++++ [0919 20:18:28] Keeping container kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping image kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] Keeping image kube-build:build-3c6a80b8f1-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] first line of kube::build::ensure_data_container()
++++ [0919 20:18:28] kube::build::ensure_data_container() === 1
++++ [0919 20:18:28] last line of kube::build::ensure_data_container()
++++ [0919 20:18:28] Syncing sources to container
++++ [0919 20:18:28] start_rsyncd_container() first line
++++ [0919 20:18:28] bofore kube::build::stop_rsyncd_container
++++ [0919 20:18:28] [start] kube::build::stop_rsyncd_container
++++ [0919 20:18:28] Stopping any currently running rsyncd container
++++ [0919 20:18:28] [mid] kube::build::stop_rsyncd_container: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:28] [kube::build::destroy_container] 1
++++ [0919 20:18:28] $\{DOCKER[@]\} is: docker
++++ [0919 20:18:29] [kube::build::destroy_container] 2
++++ [0919 20:18:29] [end] kube::build::stop_rsyncd_container: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:29] Starting rsyncd container
++++ [0919 20:18:29] kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0 -p 127.0.0.1::8730 -d     -e ALLOW_HOST=172.31.143.47
+         -- /rsyncd.sh >/dev/null
++++ [0919 20:18:29] going to execute kube::build::run_build_command_ex
+hello world
+wow
++++ [0919 20:18:29] entering method kube::build::run_build_command_ex
++++ [0919 20:18:29] [kube::build::destroy_container] 1
++++ [0919 20:18:29] $\{DOCKER[@]\} is: docker
++++ [0919 20:18:29] [kube::build::destroy_container] 2
++++ [0919 20:18:29] destry container: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:29] exec: docker
+    run
+    --name=kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    --user=1003:1003
+    --hostname=msi
+    -e=GOPROXY=
+    --volumes-from
+    kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    -p
+    127.0.0.1::8730
+    -d
+    -e
+    ALLOW_HOST=172.31.143.47 
+    --env
+    KUBE_FASTBUILD=false
+    --env
+    KUBE_BUILDER_OS=linux-gnu
+    --env
+    KUBE_VERBOSE=10
+    --env
+    KUBE_BUILD_WITH_COVERAGE=
+    --env
+    KUBE_BUILD_PLATFORMS=
+    --env
+    KUBE_CGO_OVERRIDES='  '
+    --env
+    KUBE_STATIC_OVERRIDES='  '
+    --env
+    FORCE_HOST_GO=
+    --env
+    GO_VERSION=
+    --env
+    GOTOOLCHAIN=
+    --env
+    GOFLAGS=
+    --env
+    GOGCFLAGS=
+    --env
+    SOURCE_DATE_EPOCH=
+    --interactive
+    --tty
+    kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    /rsyncd.sh
+1b29b3dde09fc1fc6654300dc2e4247f144eacd1c4efbb825c2054d19dc60c3d
++++ [0919 20:18:30] just excuted kube::build::run_build_command_ex
+mapped_port: 63819
+container_ip: 172.17.0.2
+rsync rsync://k8s@127.0.0.1:63819/          --password-file=/home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0/rsyncd.password          &> /dev/null ; then
+k8s            	
+rsync succeed
+KUBE_RSYNC_ADDR= 127.0.0.1:63819
++++ [0919 20:18:30] execute rsync
++++ [0919 20:18:30] Running rsync
++++ [0919 20:18:30] rsync command: --archive
+    --password-file=/home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0/rsyncd.password
+    -iv --delete
+    --filter=- /_tmp/
+    --filter=- /_output/
+    --filter=- /
+    /home/xinw/repos/kubernetes/
+    rsync://k8s@127.0.0.1:63819/k8s/
+sending incremental file list
+.d..t...... ./
+<f..t...... .dockerized-kube-version-defs
+<f.st...... run.log
+.d..t...... .git/
+<f..t...... .git/index
+<f.st...... build/common.sh
+
+sent 4,020,651 bytes  received 16,891 bytes  2,691,694.67 bytes/sec
+total size is 1,342,113,583  speedup is 332.41
++++ [0919 20:18:32] execute rsync succed
++++ [0919 20:18:32] [start] kube::build::stop_rsyncd_container
++++ [0919 20:18:32] Stopping any currently running rsyncd container
++++ [0919 20:18:32] [mid] kube::build::stop_rsyncd_container: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:32] [kube::build::destroy_container] 1
++++ [0919 20:18:32] $\{DOCKER[@]\} is: docker
++++ [0919 20:18:33] [kube::build::destroy_container] 2
++++ [0919 20:18:33] [end] kube::build::stop_rsyncd_container: kube-rsync-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:33] stop_rsyncd_container succed
++++ [0919 20:18:33] Output from this container will be rsynced out upon completion. Set KUBE_RUN_COPY_OUTPUT=n to disable.
++++ [0919 20:18:33] Running build command...
++++ [0919 20:18:33] KUBE_BUILD_CONTAINER_NAME: kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+wow
++++ [0919 20:18:33] entering method kube::build::run_build_command_ex
++++ [0919 20:18:33] [kube::build::destroy_container] 1
++++ [0919 20:18:33] $\{DOCKER[@]\} is: docker
++++ [0919 20:18:34] [kube::build::destroy_container] 2
++++ [0919 20:18:34] destry container: kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
++++ [0919 20:18:34] exec: docker
+    run
+    --name=kube-build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    --user=1003:1003
+    --hostname=msi
+    -e=GOPROXY=
+    --volumes-from
+    kube-build-data-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    --env
+    KUBE_FASTBUILD=false
+    --env
+    KUBE_BUILDER_OS=linux-gnu
+    --env
+    KUBE_VERBOSE=10
+    --env
+    KUBE_BUILD_WITH_COVERAGE=
+    --env
+    KUBE_BUILD_PLATFORMS=
+    --env
+    KUBE_CGO_OVERRIDES='  '
+    --env
+    KUBE_STATIC_OVERRIDES='  '
+    --env
+    FORCE_HOST_GO=
+    --env
+    GO_VERSION=
+    --env
+    GOTOOLCHAIN=
+    --env
+    GOFLAGS=
+    --env
+    GOGCFLAGS=
+    --env
+    SOURCE_DATE_EPOCH=
+    --interactive
+    --tty
+    kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+    make
+    test-cmd
+Recording: record_command_canary
+Running command: record_command_canary
+
++++ Running case: test-cmd.record_command_canary 
++++ working dir: /go/src/k8s.io/kubernetes
++++ command: record_command_canary
+/go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh: line 167: bogus-expected-to-fail: command not found
+!!! [0919 20:18:35] Call tree:
+!!! [0919 20:18:35]  1: /go/src/k8s.io/kubernetes/test/cmd/../../third_party/forked/shell2junit/sh2ju.sh:51 record_command_canary(...)
+!!! [0919 20:18:35]  2: /go/src/k8s.io/kubernetes/test/cmd/../../third_party/forked/shell2junit/sh2ju.sh:118 eVal(...)
+!!! [0919 20:18:35]  3: /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:143 juLog(...)
+!!! [0919 20:18:35]  4: /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:171 record_command(...)
+!!! [0919 20:18:35]  5: hack/make-rules/test-cmd.sh:35 source(...)
+!!! Error in /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:167
+  Error in /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:167. 'bogus-expected-to-fail' exited with status 127
+Call stack:
+  1: /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:167 record_command_canary(...)
+  2: /go/src/k8s.io/kubernetes/test/cmd/../../third_party/forked/shell2junit/sh2ju.sh:51 eVal(...)
+  3: /go/src/k8s.io/kubernetes/test/cmd/../../third_party/forked/shell2junit/sh2ju.sh:118 juLog(...)
+  4: /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:143 record_command(...)
+  5: /go/src/k8s.io/kubernetes/test/cmd/legacy-script.sh:171 source(...)
+  6: hack/make-rules/test-cmd.sh:35 main(...)
+Exiting with status 1
++++ exit code: 1
++++ error: 1
++++ [0919 20:18:35] Running kubeadm tests
+Go version: go version go1.22.4 linux/amd64
++++ [0919 20:18:47] Building go targets for linux/amd64
+    k8s.io/kubernetes/cmd/kubeadm (static)
+Env for linux/amd64: GOPATH=/go/src/k8s.io/kubernetes/_output/dockerized/go GOOS=linux GOARCH=amd64 GOROOT= CGO_ENABLED= CC=
+Building binaries with GCFLAGS= LDFLAGS=all=-X 'k8s.io/client-go/pkg/version.buildDate=2024-09-19T12:18:35Z' -X 'k8s.io/component-base/version.buildDate=2024-09-19T12:18:35Z' -X 'k8s.io/client-go/pkg/version.gitCommit=480507464f9f928ae49e561e821ed1e1cffabf34' -X 'k8s.io/component-base/version.gitCommit=480507464f9f928ae49e561e821ed1e1cffabf34' -X 'k8s.io/client-go/pkg/version.gitTreeState=dirty' -X 'k8s.io/component-base/version.gitTreeState=dirty' -X 'k8s.io/client-go/pkg/version.gitVersion=v1.31.0-alpha.2.264+480507464f9f92-dirty' -X 'k8s.io/component-base/version.gitVersion=v1.31.0-alpha.2.264+480507464f9f92-dirty' -X 'k8s.io/client-go/pkg/version.gitMajor=1' -X 'k8s.io/component-base/version.gitMajor=1' -X 'k8s.io/client-go/pkg/version.gitMinor=31+' -X 'k8s.io/component-base/version.gitMinor=31+'  -s -w
+Coverage is disabled.
++++ [0919 20:18:53] Placing binaries
++++ [0919 20:18:53] Placing binaries for linux/amd64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/amd64
++++ [0919 20:18:53] Placing binaries for linux/386 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/386
++++ [0919 20:18:53] Placing binaries for linux/arm in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/arm
++++ [0919 20:18:53] Placing binaries for linux/arm64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/arm64
++++ [0919 20:18:53] Placing binaries for linux/s390x in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/s390x
++++ [0919 20:18:53] Placing binaries for linux/ppc64le in /go/src/k8s.io/kubernetes/_output/dockerized/bin/linux/ppc64le
++++ [0919 20:18:53] Placing binaries for darwin/amd64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/darwin/amd64
++++ [0919 20:18:53] Placing binaries for darwin/arm64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/darwin/arm64
++++ [0919 20:18:53] Placing binaries for windows/amd64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/windows/amd64
++++ [0919 20:18:53] Placing binaries for windows/386 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/windows/386
++++ [0919 20:18:53] Placing binaries for windows/arm64 in /go/src/k8s.io/kubernetes/_output/dockerized/bin/windows/arm64
++++ [0919 20:18:53] Set GOMAXPROCS automatically to 12
++++ [0919 20:18:54] Running tests without code coverage 
+--- FAIL: TestCmdConfigImagesList (0.00s)
+    --- FAIL: TestCmdConfigImagesList/valid:_latest_stable_Kubernetes_version_should_not_throw_the_warning_that_a_supported_etcd_version_cannot_be_found (0.00s)
+        config_test.go:42: failed to run 'kubeadm config images list --v=1 --kubernetes-version=stable-1', err: error running /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm [config images list --v=1 --kubernetes-version=stable-1]; 
+            retcode -1, 
+            stdout "", 
+            stderr "", 
+            got error: fork/exec /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm: no such file or directory
+--- FAIL: TestCmdInitToken (0.01s)
+    --- FAIL: TestCmdInitToken/valid_token_is_accepted (0.00s)
+        init_test.go:76: 
+            CmdInitToken test case "valid token is accepted" failed with an error: error running /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm [init --dry-run --ignore-preflight-errors=all --token=abcdef.0123456789abcdef]; 
+            retcode -1, 
+            stdout "", 
+            stderr "", 
+            got error: fork/exec /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm: no such file or directory
+            command 'kubeadm init --token=abcdef.0123456789abcdef'
+            	expected: true
+            	err: false
+--- FAIL: TestCmdInitKubernetesVersion (0.00s)
+panic: could not run 'kubeadm version -o=short': error running /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm [version -o=short]; 
+retcode -1, 
+stdout "", 
+stderr "", 
+got error: fork/exec /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm: no such file or directory [recovered]
+	panic: could not run 'kubeadm version -o=short': error running /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm [version -o=short]; 
+retcode -1, 
+stdout "", 
+stderr "", 
+got error: fork/exec /go/src/k8s.io/kubernetes/_output/local/go/bin/kubeadm: no such file or directory
+
+goroutine 15 [running]:
+testing.tRunner.func1.2({0x57fe60, 0xc00003cc10})
+	/usr/local/go/src/testing/testing.go:1631 +0x24a
+testing.tRunner.func1()
+	/usr/local/go/src/testing/testing.go:1634 +0x377
+panic({0x57fe60?, 0xc00003cc10?})
+	/usr/local/go/src/runtime/panic.go:770 +0x132
+k8s.io/kubernetes/cmd/kubeadm/test/cmd.getKubeadmVersion()
+	/go/src/k8s.io/kubernetes/cmd/kubeadm/test/cmd/init_test.go:44 +0xe5
+k8s.io/kubernetes/cmd/kubeadm/test/cmd.TestCmdInitKubernetesVersion(0xc0000c1860)
+	/go/src/k8s.io/kubernetes/cmd/kubeadm/test/cmd/init_test.go:106 +0x27
+testing.tRunner(0xc0000c1860, 0x5c4210)
+	/usr/local/go/src/testing/testing.go:1689 +0xfb
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1742 +0x390
+FAIL	k8s.io/kubernetes/cmd/kubeadm/test/cmd	0.028s
+FAIL
+!!! Error in hack/make-rules/test.sh:314
+  Error in hack/make-rules/test.sh:314. 'return "${rc}"' exited with status 1
+Call stack:
+  1: hack/make-rules/test.sh:314 main(...)
+Exiting with status 1
+make[1]: *** [Makefile:192: test] Error 1
+!!! Error in hack/make-rules/test-cmd.sh:173
+  Error in hack/make-rules/test-cmd.sh:173. 'make -C "${KUBE_ROOT}" test WHAT=k8s.io/kubernetes/cmd/kubeadm/test/cmd KUBE_TIMEOUT=--timeout=240s KUBE_RACE=""' exited with status 2
+Call stack:
+  1: hack/make-rules/test-cmd.sh:173 main(...)
+Exiting with status 1
+make: *** [Makefile:309: test-cmd] Error 1
+!!! [0919 20:18:55] Call tree:
+!!! [0919 20:18:55]  1: build/../build/common.sh:508 kube::build::run_build_command_ex(...)
+!!! [0919 20:18:55]  2: build/run.sh:39 kube::build::run_build_command(...)
+!!! Error in build/../build/common.sh:600
+  Error in build/../build/common.sh:600. '"${docker_cmd[@]}" "${cmd[@]}"' exited with status 2
+Call stack:
+  1: build/../build/common.sh:600 kube::build::run_build_command_ex(...)
+  2: build/../build/common.sh:508 kube::build::run_build_command(...)
+  3: build/run.sh:39 main(...)
+Exiting with status 1

@@ -79,5 +79,6 @@ port = 8730
   path = ${VOLUME}
   filter = - /_tmp/
 EOF
+echo "CONFFILE: ${CONFFILE}"  
 
 exec /usr/bin/rsync --no-detach --daemon --config="${CONFFILE}" "$@"

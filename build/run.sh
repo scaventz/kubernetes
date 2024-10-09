@@ -18,10 +18,12 @@
 # the commands in `hack/`.  When running in the build container the user is sure
 # to have a consistent reproducible build environment.
 
-set -o errexit
-set -o nounset
-set -o pipefail
-
+# set command, refer to https://www.man7.org/linux/man-pages/man1/set.1p.html
+set -o errexit  # exit when any command fails
+set -o nounset  # expansion command ('@') fails with erorr on unset parameter
+# see https://www.gnu.org/software/bash/manual/html_node/Pipelines.html
+set -o pipefail # 
+KUBE_VERBOSE=10
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "$KUBE_ROOT/build/common.sh"
 
