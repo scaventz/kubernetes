@@ -384,7 +384,7 @@ function kube::build::clean() {
 
 # Set up the context directory for the kube-build image and build it.
 function kube::build::build_image() {
-  mkdir -p "${LOCAL_OUTPUT_BUILD_CONTEXT}"
+  mkdir -p "${LOCAL_OUTPUT_BUILD_CONTEXT}" # /home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
   # Make sure the context directory owned by the right user for syncing sources to container.
   chown -R "${USER_ID}":"${GROUP_ID}" "${LOCAL_OUTPUT_BUILD_CONTEXT}"
   kube::log::status "LOCAL_OUTPUT_BUILD_CONTEXT: ${LOCAL_OUTPUT_BUILD_CONTEXT}"
