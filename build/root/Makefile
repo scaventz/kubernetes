@@ -306,6 +306,7 @@ test-cmd:
 	echo "$$TEST_CMD_HELP_INFO"
 else
 test-cmd:
+	echo "prepare to run hack/make-rules/test-cmd.sh"
 	hack/make-rules/test-cmd.sh
 endif
 

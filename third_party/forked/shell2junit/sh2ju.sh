@@ -48,6 +48,7 @@ fi
 # A wrapper for the eval method witch allows catching seg-faults and use tee
 errfile=/tmp/evErr.$$.log
 function eVal() {
+  echo "sh2ju.sh line 51, \$1 is:" $1
   (eval "$1")
   # stdout and stderr may currently be inverted (see below) so echo may write to stderr
   echo "$?" 2>&1 | tr -d "\n" > "${errfile}"

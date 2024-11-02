@@ -61,6 +61,7 @@ source "${KUBE_ROOT}/test/cmd/template-output.sh"
 source "${KUBE_ROOT}/test/cmd/version.sh"
 source "${KUBE_ROOT}/test/cmd/wait.sh"
 
+kube::log::status "source done at line 64"
 
 ETCD_HOST=${ETCD_HOST:-127.0.0.1}
 ETCD_PORT=${ETCD_PORT:-2379}
@@ -124,7 +125,7 @@ else
   echo "failed to find third_party/forked/shell2junit/sh2ju.sh"
   exit 1
 fi
-
+kube::log::status "at line 128"
 # record_command runs the command and records its output/error messages in junit format
 # it expects the first to be the name of the command
 # Example:
@@ -142,6 +143,7 @@ function record_command() {
     echo "Running command: $*"
     juLog -output="${output}" -class="test-cmd" -name="${name}" "$@"
     local exitCode=$?
+    echo "exitCode is: "${exitCode}
     if [[ ${exitCode} -ne 0 ]]; then
       # Record failures for any non-canary commands
       if [ "${name}" != "record_command_canary" ]; then
@@ -168,6 +170,7 @@ function record_command_canary()
   set +o nounset
   set +o errexit
 }
+kube::log::status "at line 173"
 KUBE_JUNIT_REPORT_DIR=$(mktemp -d /tmp/record_command_canary.XXXXX) record_command record_command_canary
 if [[ -n "${foundError}" ]]; then
   echo "FAILED TESTS: record_command_canary"

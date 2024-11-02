@@ -34,6 +34,9 @@ GOPROXY=${GOPROXY:-""}
 
 # This will canonicalize the path
 KUBE_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd -P)
+echo "KUBE_ROOT: $KUBE_ROOT"
+KUBE_ROOT_PLAY=$(cd "$(dirname "${BASH_SOURCE}")"/.. && pwd -P)
+echo "KUBE_ROOT_PLAY: $KUBE_ROOT_PLAY"
 
 source "${KUBE_ROOT}/hack/lib/init.sh"
 
@@ -418,12 +421,15 @@ function kube::build::build_image() {
 function kube::build::docker_build() {
   kube::util::ensure-docker-buildx
 
-  local -r image=$1
-  local -r context_dir=$2
-  local -r pull="${3:-true}"
+  local -r image=$1 # $1 is ${KUBE_BUILD_IMAGE} and is kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+  local -r context_dir=$2 # $2 is ${LOCAL_OUTPUT_BUILD_CONTEXT} and is /home/xinw/repos/kubernetes/_output/images/kube-build:build-9bcdcf4a5b-5-v1.31.0-go1.22.4-bullseye.0
+  local -r pull="${3:-true}" # $3 is false
   local build_args
-  IFS=" " read -r -a build_args <<< "$4"
+  # IFS stands for Internal Field Separator
+  # -r: Prevents backslashes \ from acting as escape characters, ensuring they are interpreted literally.
+  IFS=" " read -r -a build_args <<< "$4" # $4 is --build-arg=KUBE_CROSS_IMAGE=registry.k8s.io/build-image/kube-cross --build-arg=KUBE_CROSS_VERSION=v1.31.0-go1.22.4-bullseye.0
   readonly build_args
+  # -r means readonly
   local -ra build_cmd=("${DOCKER[@]}" buildx build --load -t "${image}" "--pull=${pull}" "${build_args[@]}" "${context_dir}")
 
   kube::log::status "Building Docker image ${image}"
@@ -465,7 +471,7 @@ function kube::build::ensure_data_container() {
     kube::log::status "Creating data container ${KUBE_DATA_CONTAINER_NAME}"
     # We have to ensure the directory exists, or else the docker run will
     # create it as root.
-    kube::log::status "Making dir: LOCAL_OUTPUT_GOPATH: ${LOCAL_OUTPUT_GOPATH}"
+    kube::log::status "Making dir: LOCAL_OUTPUT_GOPATH: ${LOCAL_OUTPUT_GOPATH}" # LOCAL_OUTPUT_GOPATH is: /home/xinw/repos/kubernetes/_output/dockerized/go
     mkdir -p "${LOCAL_OUTPUT_GOPATH}"
     # We want this to run as root to be able to chown, so non-root users can
     # later use the result as a data container.  This run both creates the data
@@ -477,7 +483,8 @@ function kube::build::ensure_data_container() {
     # libraries for true static building.
     local -ra docker_cmd=(
       "${DOCKER[@]}" run
-      --volume "${REMOTE_ROOT}"   # white-out the whole output dir
+      # REMOTE_ROOT is "/go/src/${KUBE_GO_PACKAGE}"
+      --volume "${REMOTE_ROOT}"   # white-out the whole output dir 
       --volume /usr/local/go/pkg/linux_386_cgo
       --volume /usr/local/go/pkg/linux_amd64_cgo
       --volume /usr/local/go/pkg/linux_arm_cgo
@@ -590,6 +597,7 @@ function kube::build::run_build_command_ex() {
     docker_run_opts+=("--attach=stdout" "--attach=stderr")
   fi
 
+  kube::log::status "executing docker_cmd at line 597: "
   local -ra docker_cmd=(
     "${DOCKER[@]}" run "${docker_run_opts[@]}" "${KUBE_BUILD_IMAGE}")
 
@@ -609,7 +617,7 @@ function kube::build::rsync_probe {
   while (( tries > 0 )) ; do
     echo "rsync "rsync://k8s@${1}:${2}/" \
          --password-file="${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password" \
-         &> /dev/null ; then"
+         &> /dev/null"
     if rsync "rsync://k8s@${1}:${2}/" \
          --password-file="${LOCAL_OUTPUT_BUILD_CONTEXT}/rsyncd.password" \
          ; then
@@ -654,14 +662,15 @@ function kube::build::start_rsyncd_container() {
     -- /rsyncd.sh
 
   kube::log::status "just excuted kube::build::run_build_command_ex"
-
+  docker ps -a | grep ${KUBE_RSYNC_CONTAINER_NAME}
+  kube::log::status "${DOCKER[@]}" port "${KUBE_RSYNC_CONTAINER_NAME}" "${KUBE_CONTAINER_RSYNC_PORT}" "2> /dev/null | cut -d: -f 2"
   local mapped_port
   if ! mapped_port=$("${DOCKER[@]}" port "${KUBE_RSYNC_CONTAINER_NAME}" "${KUBE_CONTAINER_RSYNC_PORT}" 2> /dev/null | cut -d: -f 2) ; then
     kube::log::error "Could not get effective rsync port"
     return 1
   fi
 
-  echo "mapped_port: ${mapped_port}"
+  kube::log::status "mapped_port" ${mapped_port}
 
   local container_ip
   container_ip=$("${DOCKER[@]}" inspect --format '{{ .NetworkSettings.IPAddress }}' "${KUBE_RSYNC_CONTAINER_NAME}")
@@ -672,6 +681,9 @@ function kube::build::start_rsyncd_container() {
   # machines) we have to talk directly to the container IP.  There is no one
   # strategy that works in all cases so we test to figure out which situation we
   # are in.
+  kube::log::status "going to execute probe"
+  kube::log::status "mapped_port: ${mapped_port}"
+
   if kube::build::rsync_probe 127.0.0.1 "${mapped_port}"; then
     KUBE_RSYNC_ADDR="127.0.0.1:${mapped_port}"
     echo "KUBE_RSYNC_ADDR= 127.0.0.1:${mapped_port}"
@@ -727,7 +739,7 @@ function kube::build::sync_to_container() {
   # are hidden from rsync so they will be deleted in the target container if
   # they exist. This will allow them to be re-created in the container if
   # necessary.
-  kube::log::status "execute rsync"
+  kube::log::status "execute rsync" # somehow it's never get executed
   kube::build::rsync \
     --delete \
     --filter='- /_tmp/' \

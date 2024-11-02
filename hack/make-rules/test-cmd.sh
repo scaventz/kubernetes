@@ -32,7 +32,9 @@ export KUBE_PANIC_WATCH_DECODE_ERROR
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/../..
 source "${KUBE_ROOT}/hack/lib/init.sh"
 source "${KUBE_ROOT}/hack/lib/test.sh"
+kube::log::status "going to run legacy-script.sh"
 source "${KUBE_ROOT}/test/cmd/legacy-script.sh"
+kube::log::status "legacy-script.sh executed"
 
 # setup envs for TokenRequest required flags
 SERVICE_ACCOUNT_LOOKUP=${SERVICE_ACCOUNT_LOOKUP:-true}
