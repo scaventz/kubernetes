@@ -189,6 +189,7 @@ check test:
 	echo "$$CHECK_TEST_HELP_INFO"
 else
 check test:
+	echo "going to execute hack/make-rules/test.sh $(WHAT) $(TESTS)"
 	hack/make-rules/test.sh $(WHAT) $(TESTS)
 endif
 

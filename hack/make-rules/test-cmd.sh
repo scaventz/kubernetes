@@ -168,10 +168,22 @@ if [[ ${WHAT} == "" || ${WHAT} =~ .*kubeadm.* ]] ; then
   kube::log::status "Running kubeadm tests"
 
   # build kubeadm
-  make all -C "${KUBE_ROOT}" WHAT=cmd/kubeadm
+  echo "pwd is"
+  pwd
+  echo "KUBE_ROOT: " "${KUBE_ROOT}"
+  make all -C "${KUBE_ROOT}" WHAT=cmd/kubeadm 
   # unless the user sets KUBEADM_PATH, assume that "make all..." just built it
+  # echo "KUBEADM_PATH before exported:" "${KUBEADM_PATH}"
   export KUBEADM_PATH="${KUBEADM_PATH:=$(kube::realpath "${KUBE_ROOT}")/_output/local/go/bin/kubeadm}"
+  echo "KUBEADM_PATH: ${KUBEADM_PATH}"
   # invoke the tests
+  echo "KUBE_ROOT: ${KUBE_ROOT}"
+  echo "pwd: "
+  pwd
+  echo "ls ./"
+  ls ./ -l
+  #echo "ls k8s.io/kubernetes/cmd/kubeadm/test/ -l"
+  #ls k8s.io/kubernetes/cmd/kubeadm/test/ -l
   make -C "${KUBE_ROOT}" test \
     WHAT=k8s.io/kubernetes/cmd/kubeadm/test/cmd \
     KUBE_TIMEOUT=--timeout=240s \

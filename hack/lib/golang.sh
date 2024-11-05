@@ -630,17 +630,27 @@ kube::golang::place_bins() {
     local platform_src="/${platform//\//_}"
     if [[ "${platform}" == "${host_platform}" ]]; then
       platform_src=""
+      echo "rm -f ${THIS_PLATFORM_BIN}"
       rm -f "${THIS_PLATFORM_BIN}"
+      echo "mkdir -p" "$(dirname "${THIS_PLATFORM_BIN}")"
       mkdir -p "$(dirname "${THIS_PLATFORM_BIN}")"
+
+      echo "ln -s " "${KUBE_OUTPUT_BIN}/${platform}" "${THIS_PLATFORM_BIN}"
       ln -s "${KUBE_OUTPUT_BIN}/${platform}" "${THIS_PLATFORM_BIN}"
     fi
 
     V=3 kube::log::status "Placing binaries for ${platform} in ${KUBE_OUTPUT_BIN}/${platform}"
     local full_binpath_src="${KUBE_GOPATH}/bin${platform_src}"
+    echo "full_binpath_src is: $full_binpath_src" 
     if [[ -d "${full_binpath_src}" ]]; then
       mkdir -p "${KUBE_OUTPUT_BIN}/${platform}"
+      echo "\${KUBE_OUTPUT_BIN}/\${platform}: ${KUBE_OUTPUT_BIN}/${platform}"
+      echo "goingto execute: "
+      echo "find ${full_binpath_src}" "-maxdepth 1 -type f -exec rsync -pc {}" "${KUBE_OUTPUT_BIN}/${platform}"
       find "${full_binpath_src}" -maxdepth 1 -type f -exec \
         rsync -pc {} "${KUBE_OUTPUT_BIN}/${platform}" \;
+      echo "rsync is done, now files in destination is:"
+      ls "${KUBE_OUTPUT_BIN}/${platform}" -l
     fi
   done
 }
@@ -648,6 +658,7 @@ kube::golang::place_bins() {
 # Try and replicate the native binary placement of go install without
 # calling go install.
 kube::golang::outfile_for_binary() {
+  echo "first line of kube::golang::outfile_for_binary"
   local binary=$1
   local platform=$2
   local output_path="${KUBE_GOPATH}/bin"
@@ -740,7 +751,9 @@ kube::golang::delete_coverage_dummy_test() {
 #
 # See comments in kube::golang::setup_env regarding where built binaries go.
 kube::golang::build_some_binaries() {
+  echo "line 744"
   if [[ -n "${KUBE_BUILD_WITH_COVERAGE:-}" ]]; then
+    echo "line 746"
     local -a uncovered=()
     for package in "$@"; do
       if kube::golang::is_instrumented_package "${package}"; then
@@ -748,7 +761,7 @@ kube::golang::build_some_binaries() {
 
         kube::golang::create_coverage_dummy_test "${package}"
         kube::util::trap_add "kube::golang::delete_coverage_dummy_test \"${package}\"" EXIT
-
+        echo "line 754"
         go test -c -o "$(kube::golang::outfile_for_binary "${package}" "${platform}")" \
           -covermode count \
           -coverpkg k8s.io/... \
@@ -760,6 +773,7 @@ kube::golang::build_some_binaries() {
       fi
     done
     if [[ "${#uncovered[@]}" != 0 ]]; then
+      echo "line 766"
       V=2 kube::log::info "Building ${uncovered[*]} without coverage..."
       GOPROXY=off go install "${build_args[@]}" "${uncovered[@]}"
     else
@@ -767,7 +781,14 @@ kube::golang::build_some_binaries() {
     fi
   else
     V=2 kube::log::info "Coverage is disabled."
+    echo "pwd: "
+    pwd
+    echo "going to execute: " "go install" "${build_args[@]}" "$@"
     GOPROXY=off go install "${build_args[@]}" "$@"
+    echo "install succeeded?"
+    echo "echo gopath: $GOPATH"
+    echo "ls \$GOPATH/bin"
+    ls /${GOPATH}/bin -l
   fi
 }
 
@@ -776,7 +797,7 @@ kube::golang::build_some_binaries() {
 kube::golang::build_binaries_for_platform() {
   # This is for sanity.  Without it, user umasks can leak through.
   umask 0022
-
+  echo "kube::golang::build_binaries_for_platform entrypoint"
   local platform=$1
 
   local -a statics=()
@@ -784,6 +805,7 @@ kube::golang::build_binaries_for_platform() {
   local -a tests=()
 
   for binary in "${binaries[@]}"; do
+    echo "794 binary: " "${binary}"
     if [[ "${binary}" =~ ".test"$ ]]; then
       tests+=("${binary}")
       kube::log::info "    ${binary} (test)"
@@ -808,6 +830,8 @@ kube::golang::build_binaries_for_platform() {
       -ldflags="${goldflags}"
       -tags="${gotags:-}"
     )
+    echo "line 819"
+    echo "\${statics[@]} ${statics[@]}"
     CGO_ENABLED=0 kube::golang::build_some_binaries "${statics[@]}"
   fi
 
@@ -818,15 +842,27 @@ kube::golang::build_binaries_for_platform() {
       -ldflags="${goldflags}"
       -tags="${gotags:-}"
     )
+    echo "line 831"
     kube::golang::build_some_binaries "${nonstatics[@]}"
   fi
 
+  echo "line 827"
   for test in "${tests[@]:+${tests[@]}}"; do
     local outfile testpkg
+    echo "line 838"
     outfile=$(kube::golang::outfile_for_binary "${test}" "${platform}")
     testpkg=$(dirname "${test}")
 
     mkdir -p "$(dirname "${outfile}")"
+    echo "preparing to run go test: "
+    echo "go test -c \
+      ${goflags:+"${goflags[@]}"} \
+      -gcflags="${gogcflags}" \
+      -ldflags="${goldflags}" \
+      -tags="${gotags:-}" \
+      -o "${outfile}" \
+      "${testpkg}""
+
     go test -c \
       ${goflags:+"${goflags[@]}"} \
       -gcflags="${gogcflags}" \
@@ -835,6 +871,7 @@ kube::golang::build_binaries_for_platform() {
       -o "${outfile}" \
       "${testpkg}"
   done
+  echo "line 860"
 }
 
 # Return approximate physical memory available in gigabytes.
@@ -968,6 +1005,7 @@ kube::golang::build_binaries() {
       (
         kube::golang::set_platform_envs "${platform}"
         kube::golang::build_binaries_for_platform "${platform}"
+        kube::log::status "${platform}: build finished###"
       )
     done
   fi

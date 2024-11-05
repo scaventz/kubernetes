@@ -172,6 +172,7 @@ function record_command_canary()
 }
 kube::log::status "at line 173"
 KUBE_JUNIT_REPORT_DIR=$(mktemp -d /tmp/record_command_canary.XXXXX) record_command record_command_canary
+echo "\${foundError}: "${foundError}
 if [[ -n "${foundError}" ]]; then
   echo "FAILED TESTS: record_command_canary"
   exit 1

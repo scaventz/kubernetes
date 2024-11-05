@@ -220,11 +220,20 @@ runTests() {
   if [[ ! ${KUBE_COVER} =~ ^[yY]$ ]]; then
     kube::log::status "Running tests without code coverage ${KUBE_RACE:+"and with ${KUBE_RACE}"}"
     # shellcheck disable=SC2031
+    echo "go test starting"
+    echo "pwd is"
+    pwd
+    echo "ls ./ -l"
+    ls ./ -l
+    echo "ls /go/src/k8s.io/kubernetes/_output/ -l"
+    echo "go test" "${goflags[@]:+${goflags[@]}}" "${KUBE_TIMEOUT}" "${targets[@]}" "${testargs[@]:+${testargs[@]}}" "| tee" ${junit_filename_prefix:+"${junit_filename_prefix}.stdout"} "| grep --binary-files=text" "${go_test_grep_pattern}" "&&" "rc="$? "|| rc="$?
+
     go test "${goflags[@]:+${goflags[@]}}" \
      "${KUBE_TIMEOUT}" "${targets[@]}" \
      "${testargs[@]:+${testargs[@]}}" \
      | tee ${junit_filename_prefix:+"${junit_filename_prefix}.stdout"} \
      | grep --binary-files=text "${go_test_grep_pattern}" && rc=$? || rc=$?
+    echo "go test ended"
     produceJUnitXMLReport "${junit_filename_prefix}"
     return "${rc}"
   fi
@@ -310,7 +319,8 @@ checkFDs() {
 }
 
 checkFDs
-
+echo "ls"
+echo "going to run: runTests" "$@"
 runTests "$@"
 
 # We might run the tests for multiple versions, but we want to report only
